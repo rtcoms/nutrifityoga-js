@@ -6,13 +6,25 @@ import { useState } from "react";
 
 const HomePage: Page = function HomePage() {
   const tasks = useConvexQuery(api.tasks.get);
-  const mutateTask = useMutation(api.tasks.createTask);
+  const createTask = useMutation(api.tasks.createTask);
+  const updateTask = useMutation(api.tasks.updateTask);
   const [text, setText] = useState("");
+  const [editingTaskId, setEditingTaskId] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await mutateTask({ text });
+    if (editingTaskId) {
+      await updateTask({ id: editingTaskId, text });
+      setEditingTaskId(null);
+    } else {
+      await createTask({ text });
+    }
     setText("");
+  };
+
+  const handleEdit = (task) => {
+    setText(task.text);
+    setEditingTaskId(task._id);
   };
 
   return (
@@ -25,12 +37,15 @@ const HomePage: Page = function HomePage() {
           placeholder="Task text"
           required
         />
-        <button type="submit">Add Task</button>
+        <button type="submit">{editingTaskId ? "Update Task" : "Add Task"}</button>
       </form>
       {tasks && (
         <ul>
           {tasks.map((task) => (
-            <li key={task._id}>{task.text}</li>
+            <li key={task._id}>
+              {task.text}
+              <button onClick={() => handleEdit(task)}>Edit</button>
+            </li>
           ))}
         </ul>
       )}
