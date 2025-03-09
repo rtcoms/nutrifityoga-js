@@ -8,6 +8,7 @@ const HomePage: Page = function HomePage() {
   const tasks = useConvexQuery(api.tasks.get);
   const createTask = useMutation(api.tasks.createTask);
   const updateTask = useMutation(api.tasks.updateTask);
+  const deleteTask = useMutation(api.tasks.deleteTask);
   const [text, setText] = useState("");
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [showForm, setShowForm] = useState(false);
@@ -35,6 +36,10 @@ const HomePage: Page = function HomePage() {
       setEditingTaskId(null);
       setText("");
     }
+  };
+
+  const handleDelete = async (taskId) => {
+    await deleteTask({ id: taskId });
   };
 
   return (
@@ -70,6 +75,7 @@ const HomePage: Page = function HomePage() {
                 <>
                   {task.text}
                   <button onClick={() => handleEdit(task)}>Edit</button>
+                  <button onClick={() => handleDelete(task._id)}>Delete</button>
                 </>
               )}
             </li>
